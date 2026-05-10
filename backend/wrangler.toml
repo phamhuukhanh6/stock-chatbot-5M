@@ -1,0 +1,13 @@
+name = "stock-chatbot-5m-api"
+main = "main.py"
+compatibility_date = "2024-04-01"
+compatibility_flags = ["python_workers"]
+
+[[d1_databases]]
+binding = "DB" # Tên biến để gọi trong code Python
+database_name = "stock-chatbot-db"
+database_id = "b54841e8-0e8a-4dd6-a3e7-9a62959cad4b" # Sẽ cập nhật sau khi tạo
+
+[vars]
+# Các biến môi trường non-secret có thể để ở đây
+# API Keys sẽ được nạp qua 'npx wrangler secret put'

@@ -1,0 +1,11 @@
+fastapi
+pydantic
+pydantic-settings
+python-dotenv
+google-generativeai
+anthropic
+openai
+vnstock
+passlib
+python-jose
+pandas
