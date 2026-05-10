@@ -1,10 +1,9 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import axios from "axios";
 
 export const runtime = "edge";
 
-const handler = NextAuth({
+const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -15,17 +14,20 @@ const handler = NextAuth({
       async authorize(credentials) {
         try {
           const formData = new FormData();
-          formData.append("username", credentials?.username || "");
-          formData.append("password", credentials?.password || "");
+          formData.append("username", credentials?.username as string || "");
+          formData.append("password", credentials?.password as string || "");
 
-          const res = await axios.post("http://localhost:8000/auth/login", formData);
+          const res = await fetch("http://localhost:8000/auth/login", {
+            method: "POST",
+            body: formData
+          });
+          const data = await res.json();
           
-          if (res.data.access_token) {
-            // Get user info if needed, but for now we just return the token
+          if (res.ok && data.access_token) {
             return {
-              id: "1", // Dummy id
-              email: credentials?.username,
-              accessToken: res.data.access_token
+              id: "1",
+              email: credentials?.username as string,
+              accessToken: data.access_token
             };
           }
           return null;
@@ -53,4 +55,4 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET || "next-auth-secret-change-it",
 });
 
-export { handler as GET, handler as POST };
+export const { GET, POST } = handlers;
