@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Bot, UserPlus } from "lucide-react";
 import axios from "axios";
 
+export const runtime = "edge";
+
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

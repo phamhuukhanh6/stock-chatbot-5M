@@ -2,6 +2,8 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
+export const runtime = "edge";
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
