@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 export const runtime = "edge";
 
 const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -17,7 +18,7 @@ const { handlers, auth, signIn, signOut } = NextAuth({
           formData.append("username", credentials?.username as string || "");
           formData.append("password", credentials?.password as string || "");
 
-          const res = await fetch("http://localhost:8000/auth/login", {
+          const res = await fetch("https://stock-chatbot-5m-api.phamhuukhanh6.workers.dev/auth/login", {
             method: "POST",
             body: formData
           });
@@ -52,7 +53,7 @@ const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET || "next-auth-secret-change-it",
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "fallback-secret-1234567890",
 });
 
 export const { GET, POST } = handlers;

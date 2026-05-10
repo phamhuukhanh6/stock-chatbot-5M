@@ -10,20 +10,21 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "ai": "^6.0.175",
-    "axios": "^1.16.0",
-    "framer-motion": "^12.38.0",
+    "ai": "^4.0.0",
+    "axios": "^1.7.0",
+    "framer-motion": "^12.0.0",
     "lucide-react": "^1.14.0",
     "next": "15.1.0",
     "next-auth": "5.0.0-beta.25",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-markdown": "^9.0.0",
+    "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",
     "@tailwindcss/postcss": "^4.0.0",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

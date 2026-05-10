@@ -3,13 +3,14 @@
 import { MessageSquare, Plus, LogOut, User, FolderPlus, ChevronRight, ChevronDown, Folder, Trash2 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import axios from "axios";
 
 interface SidebarProps {
   activeSessionId: number | null;
   onSelectSession: (sessionId: number) => void;
   onNewChat: (folderId?: number) => void;
 }
+
+const API_URL = "https://stock-chatbot-5m-api.phamhuukhanh6.workers.dev";
 
 export default function Sidebar({ activeSessionId, onSelectSession, onNewChat }: SidebarProps) {
   const { data: session } = useSession();
@@ -27,13 +28,16 @@ export default function Sidebar({ activeSessionId, onSelectSession, onNewChat }:
 
   const fetchData = async () => {
     try {
-      const config = { headers: { Authorization: `Bearer ${(session as any)?.accessToken}` } };
+      const authHeaders = { Authorization: `Bearer ${(session as any)?.accessToken}` };
       const [foldersRes, sessionsRes] = await Promise.all([
-        axios.get("http://localhost:8000/folders", config),
-        axios.get("http://localhost:8000/sessions", config)
+        fetch(`${API_URL}/folders`, { headers: authHeaders }),
+        fetch(`${API_URL}/sessions`, { headers: authHeaders })
       ]);
-      setFolders(foldersRes.data);
-      setSessions(sessionsRes.data);
+      
+      if (foldersRes.ok && sessionsRes.ok) {
+        setFolders(await foldersRes.json());
+        setSessions(await sessionsRes.json());
+      }
     } catch (err) {
       console.error("Failed to fetch sidebar data:", err);
     }
@@ -42,14 +46,22 @@ export default function Sidebar({ activeSessionId, onSelectSession, onNewChat }:
   const handleAddFolder = async () => {
     if (!newFolderName.trim()) return;
     try {
-      const config = { headers: { Authorization: `Bearer ${(session as any)?.accessToken}` } };
-      await axios.post("http://localhost:8000/folders", { name: newFolderName }, config);
-      setNewFolderName("");
-      setShowAddFolder(false);
-      fetchData();
+      const res = await fetch(`${API_URL}/folders`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${(session as any)?.accessToken}`
+        },
+        body: JSON.stringify({ name: newFolderName })
+      });
+      
+      if (res.ok) {
+        setNewFolderName("");
+        setShowAddFolder(false);
+        fetchData();
+      }
     } catch (err: any) {
-      const msg = err.response?.data?.detail || "Không thể tạo thư mục. Vui lòng đăng nhập lại.";
-      alert(Array.isArray(msg) ? msg[0].msg : msg);
+      console.error("Failed to create folder:", err);
     }
   };
 
@@ -61,15 +73,16 @@ export default function Sidebar({ activeSessionId, onSelectSession, onNewChat }:
     e.stopPropagation();
     if (!confirm("Xóa thư mục này sẽ không xóa các đoạn chat bên trong (chúng sẽ ra ngoài hệ thống). Bạn chắc chứ?")) return;
     try {
-      const config = { headers: { Authorization: `Bearer ${(session as any)?.accessToken}` } };
-      await axios.delete(`http://localhost:8000/folders/${id}`, config);
-      fetchData();
+      const res = await fetch(`${API_URL}/folders/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${(session as any)?.accessToken}` }
+      });
+      if (res.ok) fetchData();
     } catch (err) {
       alert("Lỗi khi xóa");
     }
   };
 
-  // Sessions not in any folder
   const rootSessions = sessions.filter(s => !s.folder_id);
 
   return (
@@ -108,7 +121,6 @@ export default function Sidebar({ activeSessionId, onSelectSession, onNewChat }:
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 space-y-4 custom-scrollbar">
-        {/* Folders Section */}
         <div className="space-y-1">
           {folders.map(folder => (
             <div key={folder.id} className="space-y-1">
@@ -151,7 +163,6 @@ export default function Sidebar({ activeSessionId, onSelectSession, onNewChat }:
           ))}
         </div>
 
-        {/* Root Sessions */}
         <div className="space-y-1">
           <p className="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 mt-4">Hội thoại rời</p>
           {rootSessions.length === 0 ? (
